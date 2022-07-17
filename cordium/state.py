@@ -22,6 +22,12 @@ class State:
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
+    async def create_message(self, data) -> Message:
+        self.messages[message.id] = message = Message(
+            self, channel=data["channel_id"], data=data
+        )
+        return message
+
     async def process_event(self, name: str, data) -> None:
         name = name.lower()
         await self.bot.dispatch(f"raw_{name}", data)
@@ -41,6 +47,5 @@ class State:
         ...
 
     async def process_message_create(self, data) -> None:
-        message = Message(self, channel=data["channel_id"], data=data)
-        self.messages[message.id] = message
+        message = await self.create_message(data)
         await self.bot.dispatch("message_create", message)

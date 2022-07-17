@@ -87,8 +87,8 @@ class HTTPClient:
         if limit is not None:
             data["v"] = limit
         return [
-            Message(channel=d["channel_id"], data=d)
-            for d in await self.request(
+            await self.bot.state.create_message(message)
+            for message in await self.request(
                 "GET", f"/channels/{channel_id}/messages", data=data
             )
         ]
@@ -99,7 +99,7 @@ class HTTPClient:
         data = await self.request(
             "GET", f"/channels/{channel_id}/messages/{message_id}"
         )
-        return Message(channel=data["channel_id"], data=data)
+        return await self.bot.state.create_message(data)
 
     async def send_message(
         self,
@@ -140,7 +140,7 @@ class HTTPClient:
         message = await self.request(
             "POST", f"/channels/{channel_id}/messages", data=data
         )
-        return Message(channel=message["channel_id"], data=message)
+        return await self.bot.state.create_message(message)
 
     async def publish_message(
         self, channel_id: Snowflake, message_id: Snowflake
@@ -148,7 +148,7 @@ class HTTPClient:
         data = await self.request(
             "POST", f"/channels/{channel_id}/messages/{message_id}/crosspost"
         )
-        return Message(channel=data["channel_id"], data=data)
+        return await self.bot.state.create_message(data)
 
     async def edit_message(
         self,
@@ -181,7 +181,7 @@ class HTTPClient:
         message = await self.request(
             "PATCH", f"/channels/{channel_id}/messages/{message_id}", data=data
         )
-        return Message(channel=message["channel_id"], data=message)
+        return await self.bot.state.create_message(message)
 
     async def delete_message(
         self, channel_id: Snowflake, message_id: Snowflake, *, reason: str | None = None
