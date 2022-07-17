@@ -8,6 +8,7 @@ from .types.embed import Embed
 from .types.emoji import Emoji
 from .types.message import Attachment, MessageReference
 from .types.snowflake import Snowflake
+from .utils import MISSING
 
 __all__ = ("HTTPClient",)
 
@@ -150,8 +151,33 @@ class HTTPClient:
         return Message(channel=data["channel_id"], data=data)
 
     async def edit_message(
-        self, channel_id: Snowflake, message_id: Snowflake, data
+        self,
+        channel_id: Snowflake,
+        message_id: Snowflake,
+        *,
+        content: str = MISSING,
+        embeds: list[Embed] = MISSING,
+        allowed_mentions: Any = MISSING,
+        components: list[MessageComponent] = MISSING,
+        files: Any = MISSING,
+        attachments: list[Attachment] = MISSING,
+        flags: int = MISSING,
     ) -> Message:
+        data = {}
+        if content is not MISSING:
+            data["content"] = content
+        if embeds is not MISSING:
+            data["embeds"] = embeds
+        if allowed_mentions is not MISSING:
+            data["allowed_mentions"] = allowed_mentions
+        if components is not MISSING:
+            data["components"] = components
+        if files is not MISSING:
+            data["files"] = files
+        if attachments is not MISSING:
+            data["attachments"] = attachments
+        if flags is not MISSING:
+            data["flags"] = flags
         message = await self.request(
             "PATCH", f"/channels/{channel_id}/messages/{message_id}", data=data
         )
