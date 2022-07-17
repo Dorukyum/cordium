@@ -1,10 +1,14 @@
 from typing import Literal, TypedDict
 
+from .application import Application
 from .channel import Channel, ChannelMention
+from .component import MessageComponent
 from .embed import Embed
+from .interaction import MessageInteraction
 from .message import Message
 from .reaction import Reaction
 from .snowflake import Snowflake
+from .sticker import Sticker, StickerItem
 from .user import User
 
 MessageType = Literal[
@@ -49,7 +53,7 @@ class _MessageOptional(TypedDict, total=False):
     nonce: int | str
     webhook_id: Snowflake
     activity: MessageActivity
-    application: PartialApplication
+    application: Application
     application_id: Snowflake
     message_reference: MessageReference
     flags: int
