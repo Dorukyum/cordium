@@ -23,9 +23,8 @@ class State:
         self.bot = bot
 
     async def create_message(self, data) -> Message:
-        self.messages[message.id] = message = Message(
-            self, channel=data["channel_id"], data=data
-        )
+        message = Message(self, channel=data["channel_id"], data=data)
+        self.messages[message.id] = message
         return message
 
     async def process_event(self, name: str, data) -> None:
