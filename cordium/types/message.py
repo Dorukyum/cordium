@@ -1,12 +1,16 @@
 from typing import Literal, TypedDict
-from .snowflake import Snowflake
-from .channel import Channel
-from .user import User
+
+from .channel import Channel, ChannelMention
+from .embed import Embed
 from .message import Message
+from .reaction import Reaction
+from .snowflake import Snowflake
+from .user import User
 
 MessageType = Literal[
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24
 ]
+MessageActivityType = Literal[1, 2, 3, 5]
 
 
 class MessageReference(TypedDict, total=False):
@@ -16,11 +20,19 @@ class MessageReference(TypedDict, total=False):
     fail_if_not_exists: bool
 
 
+class _MessageActivityOptional(TypedDict, total=False):
+    party_id: str
+
+
+class MessageActivity(_MessageActivityOptional):
+    type: MessageActivityType
+
+
 class _MessageOptional(TypedDict, total=False):
     reactions: list[Reaction]
     nonce: int | str
     webhook_id: Snowflake
-    activity: MesssageActivity
+    activity: MessageActivity
     application: PartialApplication
     application_id: Snowflake
     message_reference: MessageReference
@@ -33,7 +45,7 @@ class _MessageOptional(TypedDict, total=False):
     stickers: list[Sticker]
 
 
-class Message(_MessageOptional, TypedDict):
+class Message(_MessageOptional):
     id: Snowflake
     channel_id: Snowflake
     author: User

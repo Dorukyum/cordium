@@ -7,6 +7,13 @@ ChannelType = Literal[0, 1, 2, 3, 4, 5, 10, 11, 12, 13]
 AutoArchiveDuration = Literal[60, 1440, 4320, 10080]
 
 
+class ChannelMention(TypedDict):
+    id: Snowflake
+    guild_id: Snowflake
+    type: ChannelType
+    name: str
+
+
 class PermissionOverwrite(TypedDict):
     id: Snowflake
     type: Literal[0, 1]
@@ -19,7 +26,7 @@ class _ThreadMetadataOptional(TypedDict, total=False):
     create_timestamp: int
 
 
-class ThreadMetadata(_ThreadMetadataOptional, TypedDict):
+class ThreadMetadata(_ThreadMetadataOptional):
     archived: bool
     auto_archive_duration: AutoArchiveDuration
     archive_timestamp: int
@@ -31,7 +38,7 @@ class _ThreadMemberOptional(TypedDict, total=False):
     user_id: Snowflake
 
 
-class ThreadMember(_ThreadMemberOptional, TypedDict):
+class ThreadMember(_ThreadMemberOptional):
     join_timestamp: int
     flags: int
 
@@ -64,6 +71,6 @@ class _ChannelOptional(TypedDict, total=False):
     flags: int
 
 
-class Channel(_ChannelOptional, TypedDict):
+class Channel(_ChannelOptional):
     id: Snowflake
     type: ChannelType
