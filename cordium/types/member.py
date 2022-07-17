@@ -16,6 +16,6 @@ class _MemberOptional(TypedDict, total=False):
 
 class Member(_MemberOptional):
     roles: list[Snowflake]
-    joined_at: int
+    joined_at: str
     deaf: bool
     mute: bool

@@ -61,7 +61,7 @@ class Embed(TypedDict, total=False):  # all optional
     type: EmbedType
     description: str
     url: str
-    timestamp: int
+    timestamp: str
     color: int
     footer: EmbedFooter
     image: EmbedImage

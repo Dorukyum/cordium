@@ -23,13 +23,13 @@ class PermissionOverwrite(TypedDict):
 
 class _ThreadMetadataOptional(TypedDict, total=False):
     invitable: bool
-    create_timestamp: int
+    create_timestamp: str
 
 
 class ThreadMetadata(_ThreadMetadataOptional):
     archived: bool
     auto_archive_duration: AutoArchiveDuration
-    archive_timestamp: int
+    archive_timestamp: str
     locked: bool
 
 
@@ -39,7 +39,7 @@ class _ThreadMemberOptional(TypedDict, total=False):
 
 
 class ThreadMember(_ThreadMemberOptional):
-    join_timestamp: int
+    join_timestamp: str
     flags: int
 
 
@@ -59,7 +59,7 @@ class _ChannelOptional(TypedDict, total=False):
     owner_id: Snowflake
     application_id: Snowflake
     parent_id: Snowflake
-    last_pin_timestamp: int
+    last_pin_timestamp: str
     rtc_region: str
     video_quality_mode: int
     message_count: int

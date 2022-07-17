@@ -69,8 +69,8 @@ class Message(_MessageOptional):
     channel_id: Snowflake
     author: User
     content: str
-    timestamp: int
-    edited_timestamp: int
+    timestamp: str
+    edited_timestamp: str
     tts: bool
     mention_everyone: bool
     mentions: list[Snowflake]
