@@ -5,7 +5,6 @@ from .channel import Channel, ChannelMention
 from .component import MessageComponent
 from .embed import Embed
 from .interaction import MessageInteraction
-from .message import Message
 from .reaction import Reaction
 from .snowflake import Snowflake
 from .sticker import Sticker, StickerItem
@@ -57,7 +56,7 @@ class _MessageOptional(TypedDict, total=False):
     application_id: Snowflake
     message_reference: MessageReference
     flags: int
-    referenced_message: Message
+    referenced_message: "Message"
     interaction: MessageInteraction
     thread: Channel
     components: list[MessageComponent]
