@@ -3,7 +3,6 @@ from typing import Literal, TypedDict
 from .snowflake import Snowflake
 from .user import User
 
-
 MembershipState = Literal[1, 2]
 
 

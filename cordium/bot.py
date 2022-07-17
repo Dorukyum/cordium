@@ -5,14 +5,18 @@ from aiohttp import ClientSession
 
 from .gateway import Gateway
 from .http import HTTPClient
+from .message import Message
 
 __all__ = ("Bot",)
 
 
 class Bot(Gateway):
+    user_agent = "DiscordBot (https://github.com/Dorukyum/cordium, 1.0.0)"
+
     def __init__(self, *, intents: int = 0) -> None:
         super().__init__(intents=intents)
-        self.http = HTTPClient(self, loop=get_event_loop())
+        self.loop = get_event_loop()
+        self.http = HTTPClient(self, loop=self.loop)
 
     def start(self, token: str | None = None) -> None:
         token = getattr(self, "token", token)
@@ -20,19 +24,13 @@ class Bot(Gateway):
             raise Exception("no bot token set")
         self.token = token
 
-        asyncio.run(self.setup())
+        self.loop.run_until_complete(self.setup())
+        self.loop.run_until_complete(self.connect())
 
     async def setup(self):
         self.session = ClientSession(
             headers={"Authorization": f"Bot {self.token}"},
         )
-
-        try:
-            await self.connect()
-        except KeyboardInterrupt:
-            await self.close()
-        except Exception as e:
-            raise e
 
     async def dispatch(self, name: str, data=None) -> None:
         try:
@@ -46,4 +44,7 @@ class Bot(Gateway):
     async def process_event(self, name: str, data) -> None:
         if name == "READY":
             return await self.dispatch("READY")
+        if name == "MESSAGE_CREATE":
+            message = Message(channel=data["channel_id"], data=data)
+            return await self.dispatch("MESSAGE_CREATE", message)
         await self.dispatch(name, data)

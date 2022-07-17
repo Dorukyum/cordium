@@ -1,9 +1,12 @@
 from asyncio import AbstractEventLoop
 from typing import Any
 
+from .message import Message
 from .types.channel import Channel
+from .types.component import MessageComponent
+from .types.embed import Embed
 from .types.emoji import Emoji
-from .types.message import Message
+from .types.message import Attachment, MessageReference
 from .types.snowflake import Snowflake
 
 __all__ = ("HTTPClient",)
@@ -23,7 +26,7 @@ class HTTPClient:
         reason: str | None = None,
         locale: str | None = None,
     ) -> Any:
-        headers = {"User-Agent": ""}
+        headers = {"User-Agent": self.bot.user_agent}
         if reason is not None:
             headers["X-Audit-Log-Reason"] = reason
         if (token := self.bot.token) is not None:
@@ -36,13 +39,13 @@ class HTTPClient:
         response = await self.bot.session.request(
             method=method,
             url=f"https://discord.com/api/v10{path}",
-            data=data,
+            json=data,
             headers=headers,
         )
         if 300 >= response.status >= 200:
             if response.content_type == "application/json":
                 return await response.json()
-        raise Exception(response.status)
+        raise Exception(response.status, response.reason)
 
     async def get_me(self):
         return await self.request("GET", "/users/@me")
@@ -63,32 +66,96 @@ class HTTPClient:
     ) -> Channel:
         return await self.request("DELETE", f"channels/{channel_id}", reason=reason)
 
-    async def get_messages(self, channel_id: Snowflake) -> list[Message]:
-        return await self.request("GET", f"/channels/{channel_id}/messages")
+    # messages
+    async def get_messages(
+        self,
+        channel_id: Snowflake,
+        *,
+        around: Snowflake | None = None,
+        before: Snowflake | None = None,
+        after: Snowflake | None = None,
+        limit: int | None = None,
+    ) -> list[Message]:
+        data = {}
+        if around is not None:
+            data["around"] = around
+        if before is not None:
+            data["before"] = before
+        if after is not None:
+            data["after"] = after
+        if limit is not None:
+            data["v"] = limit
+        return [
+            Message(channel=d["channel_id"], data=d)
+            for d in await self.request(
+                "GET", f"/channels/{channel_id}/messages", data=data
+            )
+        ]
 
     async def get_message(
         self, channel_id: Snowflake, message_id: Snowflake
     ) -> Message:
-        return await self.request(
+        data = await self.request(
             "GET", f"/channels/{channel_id}/messages/{message_id}"
         )
+        return Message(channel=data["channel_id"], data=data)
 
-    async def send_message(self, channel_id: Snowflake, data) -> Message:
-        return await self.request("POST", f"/channels/{channel_id}/messages", data=data)
+    async def send_message(
+        self,
+        channel_id: Snowflake,
+        *,
+        content: str | None = None,
+        tts: bool | None = None,
+        embeds: list[Embed] | None = None,
+        allowed_mentions: Any = None,
+        message_reference: MessageReference | None = None,
+        components: list[MessageComponent] | None = None,
+        sticker_ids: list[Snowflake] | None = None,
+        files: Any | None = None,
+        attachments: list[Attachment] | None = None,
+        flags: int | None = None,
+    ) -> Message:
+        data = {}
+        if content is not None:
+            data["content"] = content
+        if tts is not None:
+            data["tts"] = tts
+        if embeds is not None:
+            data["embeds"] = embeds
+        if allowed_mentions is not None:
+            data["allowed_mentions"] = allowed_mentions
+        if message_reference is not None:
+            data["message_reference"] = message_reference
+        if components is not None:
+            data["components"] = components
+        if sticker_ids is not None:
+            data["sticker_ids"] = sticker_ids
+        if files is not None:
+            data["files"] = files
+        if attachments is not None:
+            data["attachments"] = attachments
+        if flags is not None:
+            data["flags"] = flags
+        message = await self.request(
+            "POST", f"/channels/{channel_id}/messages", data=data
+        )
+        return Message(channel=message["channel_id"], data=message)
 
     async def publish_message(
         self, channel_id: Snowflake, message_id: Snowflake
     ) -> Message:
-        return await self.request(
+        data = await self.request(
             "POST", f"/channels/{channel_id}/messages/{message_id}/crosspost"
         )
+        return Message(channel=data["channel_id"], data=data)
 
     async def edit_message(
-        self, channel_id: Snowflake, message_id: Snowflake
+        self, channel_id: Snowflake, message_id: Snowflake, data
     ) -> Message:
-        return await self.request(
-            "PATCH", f"/channels/{channel_id}/messages/{message_id}"
+        message = await self.request(
+            "PATCH", f"/channels/{channel_id}/messages/{message_id}", data=data
         )
+        return Message(channel=message["channel_id"], data=message)
 
     async def delete_message(
         self, channel_id: Snowflake, message_id: Snowflake, *, reason: str | None = None
