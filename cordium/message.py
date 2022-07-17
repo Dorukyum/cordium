@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from .object import Object
-from .utils import try_snowflake
+from .utils import MISSING, try_snowflake
 
 if TYPE_CHECKING:
     from .state import State
@@ -24,6 +24,7 @@ class Message(Object):
     def __init__(self, state: State, *, channel, data: MessageData) -> None:
         self.state = state
         self.id: int = int(data["id"])
+        self.channel_id = data["channel_id"]
         self.content: str = data["content"]
         self.pinned: bool = data["pinned"]
         self.tts: bool = data["tts"]
@@ -43,3 +44,37 @@ class Message(Object):
         self.reactions: list[Reaction] = data.get("reactions", [])
         self.stickers: list[StickerItem] = data.get("sticker_items", [])
         self.components: list[MessageComponent] = data.get("components", [])
+
+    async def edit(
+        self,
+        *,
+        content: str = MISSING,
+        embeds: list[Embed] = MISSING,
+        allowed_mentions: Any = MISSING,
+        components: list[MessageComponent] = MISSING,
+        files: Any = MISSING,
+        attachments: list[Attachment] = MISSING,
+        flags: int = MISSING,
+    ) -> Message:
+        """Edits the message and returns the updated message."""
+        return await self.state.bot.http.edit_message(
+            self.channel_id,
+            self.id,
+            content=content,
+            embeds=embeds,
+            allowed_mentions=allowed_mentions,
+            components=components,
+            files=files,
+            attachments=attachments,
+            flags=flags,
+        )
+
+    async def publish(self) -> Message:
+        """ "Publishes" (or "crossposts") the message."""
+        return await self.state.bot.http.publish_message(self.channel_id, self.id)
+
+    async def delete(self, reason: str | None = None) -> Message:
+        """Deletes the message and returns the deleted message."""
+        return await self.state.bot.http.delete_message(
+            self.channel_id, self.id, reason=reason
+        )
