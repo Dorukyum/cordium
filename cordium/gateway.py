@@ -6,11 +6,14 @@ from random import random
 
 from aiohttp import ClientSession
 
+from .state import State
+
 __all__ = ("Gateway",)
 
 
 class Gateway:
     session: ClientSession
+    state: State
     token: str
     sequence: int | None = None
     session_id: int | None = None
@@ -80,9 +83,6 @@ class Gateway:
             }
         )
 
-    async def process_event(self, name: str, data) -> None:
-        ...
-
     async def send(self, payload) -> None:
         await self.socket.send_json(payload)
 
@@ -95,7 +95,7 @@ class Gateway:
                 self.sequence = raw_data["s"]
                 if (event := raw_data["t"]) == "READY":
                     self.session_id = data["session_id"]
-                await self.process_event(event, data)
+                await self.state.process_event(event, data)
 
             elif op == 1:
                 await self.send_heartbeat()

@@ -1,11 +1,10 @@
-import asyncio
-from asyncio.events import get_event_loop
+from asyncio import get_event_loop
 
 from aiohttp import ClientSession
 
 from .gateway import Gateway
 from .http import HTTPClient
-from .message import Message
+from .state import State
 
 __all__ = ("Bot",)
 
@@ -15,6 +14,7 @@ class Bot(Gateway):
 
     def __init__(self, *, intents: int = 0) -> None:
         super().__init__(intents=intents)
+        self.state = State(self)
         self.loop = get_event_loop()
         self.http = HTTPClient(self, loop=self.loop)
 
@@ -32,19 +32,10 @@ class Bot(Gateway):
             headers={"Authorization": f"Bot {self.token}"},
         )
 
-    async def dispatch(self, name: str, data=None) -> None:
+    async def dispatch(self, name: str, *args) -> None:
         try:
             func = getattr(self, f"on_{name.lower()}")
-            if data is not None:
-                return await func(data)
-            await func()
         except AttributeError:
             pass
-
-    async def process_event(self, name: str, data) -> None:
-        if name == "READY":
-            return await self.dispatch("READY")
-        if name == "MESSAGE_CREATE":
-            message = Message(channel=data["channel_id"], data=data)
-            return await self.dispatch("MESSAGE_CREATE", message)
-        await self.dispatch(name, data)
+        else:
+            await func(*args)

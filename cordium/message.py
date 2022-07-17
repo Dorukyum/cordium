@@ -1,20 +1,28 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from .object import Object
-from .types.component import MessageComponent
-from .types.embed import Embed
-from .types.message import Application as ApplicationData
-from .types.message import Attachment
-from .types.message import Message as MessageData
-from .types.message import MessageActivity as MessageActivityData
-from .types.message import MessageType
-from .types.reaction import Reaction
-from .types.sticker import StickerItem
 from .utils import try_snowflake
+
+if TYPE_CHECKING:
+    from .state import State
+    from .types.component import MessageComponent
+    from .types.embed import Embed
+    from .types.message import Application as ApplicationData
+    from .types.message import Attachment
+    from .types.message import Message as MessageData
+    from .types.message import MessageActivity as MessageActivityData
+    from .types.message import MessageType
+    from .types.reaction import Reaction
+    from .types.sticker import StickerItem
 
 __all__ = ("Message",)
 
 
 class Message(Object):
-    def __init__(self, *, channel, data: MessageData) -> None:
+    def __init__(self, state: State, *, channel, data: MessageData) -> None:
+        self.state = state
         self.id: int = int(data["id"])
         self.content: str = data["content"]
         self.pinned: bool = data["pinned"]
