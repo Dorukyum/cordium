@@ -28,6 +28,22 @@ class MessageActivity(_MessageActivityOptional):
     type: MessageActivityType
 
 
+class _AttachmentOptional(TypedDict, total=False):
+    description: str
+    content_type: str
+    height: int
+    width: int
+    ephemeral: bool
+
+
+class Attachment(_AttachmentOptional):
+    id: int
+    filename: str
+    size: int
+    url: str
+    proxy_url: str
+
+
 class _MessageOptional(TypedDict, total=False):
     reactions: list[Reaction]
     nonce: int | str
