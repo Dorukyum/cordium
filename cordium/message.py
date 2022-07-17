@@ -1,3 +1,4 @@
+from .object import Object
 from .types.component import MessageComponent
 from .types.embed import Embed
 from .types.message import Application as ApplicationData
@@ -12,7 +13,7 @@ from .utils import try_snowflake
 __all__ = ("Message",)
 
 
-class Message:
+class Message(Object):
     def __init__(self, *, channel, data: MessageData) -> None:
         self.id: int = int(data["id"])
         self.content: str = data["content"]
