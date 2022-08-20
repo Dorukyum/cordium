@@ -14,11 +14,11 @@ class TeamMember(TypedDict):
 
 
 class Team(TypedDict):
-    icon: str
     id: Snowflake
     members: list[TeamMember]
     name: str
     owner_user_id: Snowflake
+    icon: str | None
 
 
 class InstallParams(TypedDict):
@@ -44,10 +44,10 @@ class _ApplicationOptional(TypedDict, total=False):
 class Application(_ApplicationOptional):
     id: Snowflake
     name: str
-    icon: str
     description: str
     bot_public: bool
     bot_require_code_grant: bool
     summary: Literal[""]
     verify_key: str
-    team: Team
+    team: Team | None
+    icon: str | None

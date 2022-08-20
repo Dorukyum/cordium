@@ -6,12 +6,12 @@ from .user import User
 
 class _MemberOptional(TypedDict, total=False):
     user: User
-    nick: str
-    avatar: str
-    premium_since: int
     pending: bool
     permissions: str
-    communication_disabled_until: int
+    nick: str | None
+    avatar: str | None
+    premium_since: int | None
+    communication_disabled_until: int | None
 
 
 class Member(_MemberOptional):

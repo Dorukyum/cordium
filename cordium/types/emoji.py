@@ -5,7 +5,7 @@ from .user import User
 
 
 class _EmojiOptional(TypedDict, total=False):
-    name: str  # can be None only in reaction emoji objects
+    name: str | None
     roles: list[Snowflake]
     user: User
     require_colons: bool
@@ -15,4 +15,4 @@ class _EmojiOptional(TypedDict, total=False):
 
 
 class Emoji(_EmojiOptional):
-    id: Snowflake
+    id: Snowflake | None

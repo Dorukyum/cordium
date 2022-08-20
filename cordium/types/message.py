@@ -56,12 +56,12 @@ class _MessageOptional(TypedDict, total=False):
     application_id: Snowflake
     message_reference: MessageReference
     flags: int
-    referenced_message: "Message"
     interaction: MessageInteraction
     thread: Channel
     components: list[MessageComponent]
     sticker_items: list[StickerItem]
     stickers: list[Sticker]
+    referenced_message: "Message" | None
 
 
 class Message(_MessageOptional):
@@ -70,7 +70,6 @@ class Message(_MessageOptional):
     author: User
     content: str
     timestamp: str
-    edited_timestamp: str
     tts: bool
     mention_everyone: bool
     mentions: list[Snowflake]
@@ -80,3 +79,4 @@ class Message(_MessageOptional):
     embeds: list[Embed]
     pinned: bool
     type: MessageType
+    edited_timestamp: str | None

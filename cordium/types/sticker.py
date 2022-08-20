@@ -19,10 +19,10 @@ class _StickerOptional(TypedDict, total=False):
 class Sticker(_StickerOptional):
     id: Snowflake
     name: str
-    description: str
     tags: str
     type: StickerType
     format_type: StickerFormatType
+    description: str | None
 
 
 class StickerItem(TypedDict):
